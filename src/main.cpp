@@ -38,8 +38,26 @@ std::string getFileExtension(std::string inputFile)
 }
 
 
-void BMPFileInit() { std::cout << "[Converting] to BMP." <<std::endl; }
-void DDSFileInit() { std::cout << "[Converting] to DDS." <<std::endl; }
+void convertTo(std::string fileExtension, std::string fileName)
+{
+    std::cout << "[Converting] Get BMP information." <<std::endl;
+    std::cout << "[Converting] Convert from BMP to DDS." <<std::endl;
+
+    if (fileExtension == BMP)
+    {
+        std::shared_ptr<BMPFile> pBMPFile(new BMPFile);
+
+        pBMPFile->BMPInit();
+        pBMPFile->saveAsBMP();
+    }
+    else
+    {
+        std::shared_ptr<DDSFile> pDDSFile(new DDSFile);
+
+        pDDSFile->DDSInit();
+        pDDSFile->saveAsDDS();
+    }
+}
 
 
 int main(int argc, char* argv[])
@@ -73,7 +91,7 @@ int main(int argc, char* argv[])
             std::cout << "[Start] Convert from BMP to DDS" <<std::endl;
             std::cout << "[Init] Check image size" <<std::endl;
 
-            (fileExtension == BMP) ? BMPFileInit() : DDSFileInit();
+            convertTo(fileExtension, argv[1]);
 
             std::cout << "[Finish] Done." <<std::endl;
         }

@@ -7,7 +7,12 @@
 
 
 class BMPFile {
+public:
+    BMPFile();
+    ~BMPFile();
 
+    static void BMPInit();
+    void saveAsBMP();
 };
 
 

@@ -7,7 +7,12 @@
 
 
 class DDSFile {
+public:
+    DDSFile();
+    ~DDSFile();
 
+    static void DDSInit();
+    void saveAsDDS();
 };
 
 
