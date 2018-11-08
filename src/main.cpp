@@ -1,7 +1,13 @@
 
-#include <iostream>
 #include "BMPFile.h"
 #include "DDSFile.h"
+#include <iostream>
+#include <string>
+#include <array>
+#include <vector>
+#include <iterator>
+#include <sstream>
+#include <fstream>
 
 
 const std::string BMP  = "bmp";
@@ -19,7 +25,6 @@ void help()
               << "OR \n"
               << "./converter input.file \n\n\n"
               << std::endl;
-
 }
 
 
@@ -32,30 +37,34 @@ std::string toLowerCase(std::string s)
 
 std::string getFileExtension(std::string inputFile)
 {
-    std::string fileExtension = inputFile.substr(inputFile.find_last_of(".") + 1);
-    std::cout << "Input file type: " << fileExtension << std::endl;
-    return toLowerCase(fileExtension);
+    std::string fileExtension = toLowerCase(inputFile.substr(inputFile.find_last_of(".") + 1));
+    std::cout << "\nInput file type: " << fileExtension << std::endl;
+    std::cout << "Convert to: " << ((fileExtension == BMP) ? DDS : BMP) << std::endl;
+    return fileExtension;
 }
 
 
 void convertTo(std::string fileExtension, std::string fileName)
 {
-    std::cout << "[Converting] Get BMP information." <<std::endl;
-    std::cout << "[Converting] Convert from BMP to DDS." <<std::endl;
+    std::cout << "[Converting] Geting file information." <<std::endl;
+    std::cout << "[Converting] Start convert file." <<std::endl;
+
+    std::shared_ptr<BMPFile> pBMPFile(new BMPFile);
+    std::shared_ptr<DDSFile> pDDSFile(new DDSFile);
 
     if (fileExtension == BMP)
     {
-        std::shared_ptr<BMPFile> pBMPFile(new BMPFile);
-
-        pBMPFile->BMPInit();
-        pBMPFile->saveAsBMP();
+        pBMPFile->BMPInit(fileName); // Read file and test size
+        pDDSFile->createDDSFile(400, 400);
+    }
+    else if (fileExtension == DDS)
+    {
+        pDDSFile->DDSInit(fileName);
+        pBMPFile->createBMPFile();
     }
     else
     {
-        std::shared_ptr<DDSFile> pDDSFile(new DDSFile);
-
-        pDDSFile->DDSInit();
-        pDDSFile->saveAsDDS();
+        std::cout << "File not supported." << std::endl;
     }
 }
 
@@ -64,15 +73,6 @@ int main(int argc, char* argv[])
 {
     try
     {
-        // Initial version
-        // >> just accept 1 argument, input.file
-        // >> Check size multiple by 4
-        // >> Check extension if is valid.
-        // >> Based on extension, convert to the other, eg. input.BMP > input.DDS or input.DDS > input.BMP
-        // TODO: Better string output, step by step
-        // TODO: Update the HELPER function
-        // TODO: Create a Utils.h file for string helper functions?!
-
         std::string arg1 = toLowerCase(argv[1]);
         if (arg1 == HELP || arg1 == MAN)
         {
@@ -81,15 +81,13 @@ int main(int argc, char* argv[])
         else
         {
             std::string fileExtension = getFileExtension(argv[1]);
+            std::cout << "\n[Start] Init." <<std::endl;
 
             if ((fileExtension != BMP) && (fileExtension != DDS))
             {
                 std::cout << "Error! File not supported --> " << argv[1] << std::endl;
                 return 1;
             }
-
-            std::cout << "[Start] Convert from BMP to DDS" <<std::endl;
-            std::cout << "[Init] Check image size" <<std::endl;
 
             convertTo(fileExtension, argv[1]);
 
