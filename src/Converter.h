@@ -29,21 +29,10 @@
 
 class Converter {
 public:
-    Converter();
-    virtual ~Converter();
-
-    int convertDDSToBMP(DDS_HEADER header) ;
-    int convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* inforHeader);
+    int convertDDSToBMP(DDS_HEADER* header, uint8_t* pixels) ;
+    int convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* inforHeader, uint8_t* dataBuffer);
 
     bool isFileSizeValid(int width, int height);
-
-    uint8_t* BMPUncompressedImageData(int imageSize) const;
-    uint8_t* DDSUncompressedImageData(int dwWidth, int dwHeight) const;
-
-private:
-    uint8_t* dataBuffer; //DDS
-    uint8_t* pixels;     //BMP
-
 };
 
 

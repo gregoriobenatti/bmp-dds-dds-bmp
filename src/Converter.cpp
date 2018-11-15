@@ -14,55 +14,39 @@
 #include <fstream>
 
 
-Converter::Converter()
-{
-    dataBuffer = nullptr;
-    pixels = nullptr;
-}
-
-Converter::~Converter()
-{
-    if (dataBuffer != nullptr) { delete[] dataBuffer; }
-    if (pixels != nullptr)     { delete[] pixels; }
-}
-
-
-int Converter::convertDDSToBMP(DDS_HEADER header) // change to pointer??
+int Converter::convertDDSToBMP(DDS_HEADER* header, uint8_t* pixels) // change to pointer??
 {
     // create BMP structure, refactor, put in other function
     BITMAPFILEHEADER* bmpHeader = new BITMAPFILEHEADER();
     BITMAPINFOHEADER* bmpInfoHeader = new BITMAPINFOHEADER();
 
     bmpHeader->bfType = BF_TYPE_MB;
-    bmpHeader->bfSize = (header.dwWidth * header.dwHeight * 3) + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    bmpHeader->bfSize = HEADER_SIZE; //(header->dwWidth * header->dwHeight * 3) + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
     bmpHeader->bfReserved1 = 0;
     bmpHeader->bfReserved2 = 0;
     bmpHeader->bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
     bmpInfoHeader->biSize = sizeof(BITMAPINFOHEADER);
-    bmpInfoHeader->biWidth = header.dwWidth;
-    bmpInfoHeader->biHeight = header.dwHeight;
+    bmpInfoHeader->biWidth = header->dwWidth;
+    bmpInfoHeader->biHeight = header->dwHeight;
     bmpInfoHeader->biPlanes = NUM_OF_PLANES;
     bmpInfoHeader->biBitCount = BIT_COUNT_24;
     bmpInfoHeader->biCompression = BI_RGB;
-    bmpInfoHeader->biSizeImage = (header.dwWidth * header.dwHeight * 3);
+    bmpInfoHeader->biSizeImage = (header->dwWidth * header->dwHeight * 3);
     bmpInfoHeader->biXPelsPerMeter = PIXELS_PER_METER;
     bmpInfoHeader->biYPelsPerMeter = PIXELS_PER_METER;
     bmpInfoHeader->biClrUsed = 0;
     bmpInfoHeader->biClrImportant = 0;
-
-    pixels = BMPUncompressedImageData(bmpInfoHeader->biSizeImage);
-
 
     // write file BMP
     std::string fileName = "output.bmp";
     std::ofstream outputFile;
     outputFile.open(fileName, std::ofstream::out | std::ofstream::binary | std::ofstream::app);
 
-    if (!isFileSizeValid(header.dwWidth, header.dwHeight))
+    if (!isFileSizeValid(header->dwWidth, header->dwHeight))
     {
         std::cout << "File size not valid" << std::endl;
-        return 0;
+        return 1;
     }
 
     if (outputFile.is_open())
@@ -83,13 +67,14 @@ int Converter::convertDDSToBMP(DDS_HEADER header) // change to pointer??
         outputFile.write((const char *)&bmpInfoHeader->biXPelsPerMeter, 4);
         outputFile.write((const char *)&bmpInfoHeader->biYPelsPerMeter, 4);
         outputFile.write((const char *)&bmpInfoHeader->biClrUsed, 4);
-        outputFile.write((const char *)&bmpInfoHeader->biClrImportant, 4); 
+        outputFile.write((const char *)&bmpInfoHeader->biClrImportant, 4);
 
         unsigned int imageSize = bmpInfoHeader->biSizeImage;
         uint8_t* pCopy = new uint8_t[imageSize];
         memcpy(pCopy, pixels, imageSize);
 
-        for (unsigned long i = 0; i < imageSize; i += 3) {
+        for (unsigned long i = 0; i < imageSize; i += 3)
+        {
             uint8_t tmpRGB = 0;
             tmpRGB = pCopy[i];
             pCopy[i] = pCopy[i + 2];
@@ -97,7 +82,8 @@ int Converter::convertDDSToBMP(DDS_HEADER header) // change to pointer??
         }
 
         unsigned int arraySize = bmpInfoHeader->biSizeImage;
-        for (unsigned int i = 0; i < arraySize; ++i) {
+        for (unsigned int i = 0; i < arraySize; ++i)
+        {
             outputFile.write((const char *)&pCopy[i], 1);
         }
         outputFile.close();
@@ -109,10 +95,9 @@ int Converter::convertDDSToBMP(DDS_HEADER header) // change to pointer??
 }
 
 
-int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* inforHeader)
+int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* inforHeader, uint8_t* dataBuffer)
 {
     // create BMP structure, refactor, put in other function
-    //Create header
     DDS_HEADER* ddsHeader = new DDS_HEADER();
 
     ddsHeader->dwSize = HEADER_SIZE;
@@ -124,7 +109,6 @@ int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* i
     ddsHeader->dwMipMapCount = 0;
     ddsHeader->dwReserved1[11];
 
-    //Create pixel format
     DDS_PIXELFORMAT pixelFormat;
     pixelFormat.dwSize = INFO_SIZE;
     pixelFormat.dwFlags = DDPF_FOURCC;
@@ -142,13 +126,17 @@ int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* i
     ddsHeader->dwCaps4 = 0;
     ddsHeader->dwReserved2 = 0;
 
-    dataBuffer = DDSUncompressedImageData(inforHeader->biWidth, inforHeader->biHeight); //DXT1Compress(uncompressedImageData, m_pDdsHeader->dwPitchOrLinearSize, imageSize, width, height);
-
 
     // write file DDS
     std::string fileName = "output.dds";
     std::ofstream outputFile;
     outputFile.open(fileName, std::ofstream::out | std::ofstream::binary | std::ofstream::app);
+
+    if (!isFileSizeValid(inforHeader->biWidth, inforHeader->biHeight))
+    {
+        std::cout << "File size not valid" << std::endl;
+        return 1;
+    }
 
     if (outputFile.is_open())
     {
@@ -191,34 +179,4 @@ int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* i
 bool Converter::isFileSizeValid(int width, int height)
 {
     return ((width%4 == 0) && (height%4 == 0)) ? true : false;
-}
-
-
-
-uint8_t* Converter::BMPUncompressedImageData(int imageSize) const
-{
-    if (pixels == nullptr)
-        return nullptr;
-
-    //Copy the image data to avoid awkward accidental deleting
-    uint8_t* pCopy = new uint8_t[imageSize];
-    memcpy(pCopy, pixels, imageSize);
-
-    return pCopy;
-}
-
-
-uint8_t* Converter::DDSUncompressedImageData(int dwWidth, int dwHeight) const
-{
-    if (dataBuffer == nullptr)
-        return nullptr;
-
-    //const unsigned int width = dwWidth;
-    //const unsigned int height = dwHeight;
-
-    //Allocate memory for uncompressed image data, width * height * 3 color bytes per pixel
-    //uint8_t* bytesBuffer = new uint8_t[width * height * 3];
-    uint8_t* bytesBuffer = new uint8_t[dwWidth * dwHeight * 3];
-
-    return bytesBuffer;
 }

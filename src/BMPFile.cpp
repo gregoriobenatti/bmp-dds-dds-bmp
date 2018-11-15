@@ -15,6 +15,7 @@ BMPFile::BMPFile()
 {
     bmpHeader = nullptr;
     bmpInfoHeader = nullptr;
+    pixels = nullptr;
 }
 
 
@@ -22,14 +23,16 @@ BMPFile::~BMPFile()
 {
     delete[] bmpHeader;
     delete[] bmpInfoHeader;
+    if (pixels == nullptr)
+    {
+        delete[] pixels;
+    }
 }
 
 
 BMPSTRUCT BMPFile::BMPInit(std::string fileName)
 {
     BMPSTRUCT bmp;
-
-    std::cout << "[BMPFile] BMPInit" << std::endl;
 
     uint8_t* dataBuffer[2] = { nullptr, nullptr };
     bmpHeader = nullptr;
@@ -68,8 +71,22 @@ BMPSTRUCT BMPFile::BMPInit(std::string fileName)
     bmpInfoHeader->biClrUsed       = *reinterpret_cast<uint32_t *>(&header[46]); // the number of colors in the color palette, or 0 to default to 2n
     bmpInfoHeader->biClrImportant  = *reinterpret_cast<uint32_t *>(&header[50]); // the number of important colors used, or 0 when every color is important; generally ignored
 
+    unsigned int imageSize = bmpInfoHeader->biSizeImage == 0 ? bmpHeader->bfSize - bmpHeader->bfOffBits : bmpInfoHeader->biSizeImage;
+    pixels = new uint8_t[imageSize];
+    file.seekg(bmpHeader->bfOffBits);
+    file.read((char*) pixels, imageSize);
+
+    for (unsigned long i = 0; i < imageSize; i += 3)
+    {
+        uint8_t tmpRGB = 0;
+        tmpRGB = pixels[i];
+        pixels[i] = pixels[i + 2];
+        pixels[i + 2] = tmpRGB;
+    }
+
     bmp.fileHeader = bmpHeader;
     bmp.infoHeader = bmpInfoHeader;
+    bmp.pixels = pixels;
 
     return bmp;
 }

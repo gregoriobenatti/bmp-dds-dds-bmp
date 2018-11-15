@@ -37,6 +37,7 @@ typedef struct {
 typedef struct {
     BITMAPFILEHEADER* fileHeader;
     BITMAPINFOHEADER* infoHeader;
+    uint8_t* pixels;
 } BMPSTRUCT;
 
 
@@ -51,6 +52,7 @@ public:
 private:
     BITMAPFILEHEADER* bmpHeader;
     BITMAPINFOHEADER* bmpInfoHeader;
+    uint8_t* pixels;
 };
 
 

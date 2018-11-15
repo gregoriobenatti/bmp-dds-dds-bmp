@@ -39,13 +39,18 @@ typedef struct {
     DWORD           dwReserved2;
 } DDS_HEADER;
 
+typedef struct {
+    DDS_HEADER* header;
+    uint8_t* dataBuffer;
+} DDSSTRUCT;
+
 
 class DDSFile {
 public:
     DDSFile();
     virtual ~DDSFile();
 
-    DDS_HEADER DDSInit(std::string fileName);
+    DDSSTRUCT DDSInit(std::string fileName);
 
 
 private:

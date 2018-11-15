@@ -54,13 +54,13 @@ void convertTo(std::string fileExtension, std::string fileName)
 
     if (fileExtension == BMP)
     {
-        BMPSTRUCT header = pBMPFile->BMPInit(fileName);
-        converter->convertBMPToDDS(header.fileHeader, header.infoHeader);
+        BMPSTRUCT bmp = pBMPFile->BMPInit(fileName);
+        converter->convertBMPToDDS(bmp.fileHeader, bmp.infoHeader, bmp.pixels);
     }
     else if (fileExtension == DDS)
     {
-        DDS_HEADER header = pDDSFile->DDSInit(fileName);
-        converter->convertDDSToBMP(header);
+        DDSSTRUCT dds = pDDSFile->DDSInit(fileName);
+        converter->convertDDSToBMP(dds.header, dds.dataBuffer);
     }
     else
     {
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
             convertTo(fileExtension, argv[1]);
 
-            std::cout << "\n[Finish] bmp-dds-dds-bmp." <<std::endl;
+            std::cout << "[Finish] bmp-dds-dds-bmp." <<std::endl;
         }
     }
     catch (...)

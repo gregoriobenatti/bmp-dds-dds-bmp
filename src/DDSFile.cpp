@@ -27,10 +27,9 @@ DDSFile::~DDSFile()
 }
 
 
-DDS_HEADER DDSFile::DDSInit(std::string fileName)
+DDSSTRUCT DDSFile::DDSInit(std::string fileName)
 {
-    std::cout << "[DDSFile] DDSInit" << std::endl;
-    DDS_HEADER dds;
+    DDSSTRUCT dds;
 
     dataBuffer = nullptr;
     ddsHeader = nullptr;
@@ -43,15 +42,16 @@ DDS_HEADER DDSFile::DDSInit(std::string fileName)
 
     dataBuffer = new uint8_t[sizeof(DDS_HEADER)];
     file.read((char*)dataBuffer, sizeof(DDS_HEADER));
-
-    // Construct the values from the buffers
     ddsHeader = (DDS_HEADER*)dataBuffer;
 
-    unsigned int mainImageSize = std::max(1, (int)(ddsHeader->dwWidth + 3) / 4) * std::max(1, (int)(ddsHeader->dwHeight + 3) / 4) * 8;
+    unsigned int mainImageSize = std::max((unsigned int)1, (unsigned int)(ddsHeader->dwWidth + 3) / 4) * std::max((unsigned int)1, (unsigned int)(ddsHeader->dwHeight + 3) / 4) * 8;
+    if (mainImageSize != ddsHeader->dwPitchOrLinearSize)
+    {
+        std::cout << "Something is weird, check DDS file." << std::endl;
+    }
     dataBuffer = new uint8_t[mainImageSize];
-    file.read((char*)dataBuffer, mainImageSize);
-
-    std::cout << "[DDSFile] ." << std::endl;
+    dds.header = ddsHeader;
+    dds.dataBuffer = new uint8_t[mainImageSize]; //DX1Compress probably here
 
     return dds;
 }
