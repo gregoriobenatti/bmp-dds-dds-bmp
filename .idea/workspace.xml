@@ -15,15 +15,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8bcd21d5-83ba-4c80-9d26-0fd83afab990" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Converter.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Converter.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BMPFile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/BMPFile.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BMPFile.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/BMPFile.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DDSFile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/DDSFile.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DDSFile.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/DDSFile.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Converter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/Converter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Converter.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/Converter.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -70,8 +64,8 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="cpp" value="9490" />
-          <entry key="h" value="1144" />
+          <entry key="cpp" value="10011" />
+          <entry key="h" value="1182" />
           <entry key="mm" value="134" />
           <entry key="txt" value="12" />
         </counts>
@@ -79,7 +73,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CMakeLists.txt" value="9" />
-          <entry key="ObjectiveC" value="10768" />
+          <entry key="ObjectiveC" value="11327" />
           <entry key="PLAIN_TEXT" value="3" />
         </counts>
       </usages-collector>
@@ -141,8 +135,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/DDSFile.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="421">
-              <caret line="44" selection-start-line="44" selection-end-line="45" selection-end-column="23" />
+            <state relative-caret-position="467">
+              <caret line="33" column="19" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="19" />
               <folding>
                 <element signature="e#122#139#0" expanded="true" />
               </folding>
@@ -150,11 +144,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Converter.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="116" column="23" lean-forward="true" selection-start-line="116" selection-start-column="23" selection-end-line="116" selection-end-column="23" />
+            <state relative-caret-position="578">
+              <caret line="144" column="62" selection-start-line="144" selection-start-column="62" selection-end-line="144" selection-end-column="62" />
               <folding>
                 <element signature="e#53#75#0" expanded="true" />
               </folding>
@@ -162,11 +156,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Converter.h">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="600">
-              <caret line="40" column="4" selection-start-line="40" selection-start-column="4" selection-end-line="41" selection-end-column="30" />
+              <caret line="40" column="63" selection-start-line="40" selection-start-column="63" selection-end-line="40" selection-end-column="63" />
               <folding>
                 <element signature="e#126#146#0" expanded="true" />
               </folding>
@@ -184,6 +178,7 @@
       <find>size_t</find>
       <find>isFileSizeValid</find>
       <find>ddspf</find>
+      <find>biSizeImage</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -206,9 +201,9 @@
         <option value="$PROJECT_DIR$/src/BMPFile.h" />
         <option value="$PROJECT_DIR$/src/BMPFile.cpp" />
         <option value="$PROJECT_DIR$/src/DDSFile.cpp" />
+        <option value="$PROJECT_DIR$/src/main.cpp" />
         <option value="$PROJECT_DIR$/src/Converter.h" />
         <option value="$PROJECT_DIR$/src/Converter.cpp" />
-        <option value="$PROJECT_DIR$/src/main.cpp" />
       </list>
     </option>
   </component>
@@ -299,12 +294,12 @@
       <workItem from="1541633078527" duration="2304000" />
       <workItem from="1541635781967" duration="14377000" />
       <workItem from="1541955619314" duration="15325000" />
-      <workItem from="1542314175267" duration="3614000" />
+      <workItem from="1542314175267" duration="5562000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54104000" />
+    <option name="totallyTimeSpent" value="56052000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -320,7 +315,7 @@
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7554404" visible="true" weight="0.21778488" />
-      <window_info active="true" id="Structure" order="1" sideWeight="0.24455959" side_tool="true" visible="true" weight="0.21778488" />
+      <window_info id="Structure" order="1" sideWeight="0.24455959" side_tool="true" visible="true" weight="0.21778488" />
       <window_info id="Favorites" order="2" sideWeight="0.23647605" side_tool="true" weight="0.25239617" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -350,7 +345,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/Converter.cpp</url>
-          <line>122</line>
+          <line>152</line>
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -360,7 +355,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/src/Converter.cpp</url>
-          <line>41</line>
+          <line>67</line>
           <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -534,26 +529,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/DDSFile.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="44" selection-start-line="44" selection-end-line="45" selection-end-column="23" />
-          <folding>
-            <element signature="e#122#139#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Converter.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="116" column="23" lean-forward="true" selection-start-line="116" selection-start-column="23" selection-end-line="116" selection-end-column="23" />
-          <folding>
-            <element signature="e#53#75#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="534">
@@ -564,12 +539,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/DDSFile.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="467">
+          <caret line="33" column="19" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="19" />
+          <folding>
+            <element signature="e#122#139#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Converter.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
-          <caret line="40" column="4" selection-start-line="40" selection-start-column="4" selection-end-line="41" selection-end-column="30" />
+          <caret line="40" column="63" selection-start-line="40" selection-start-column="63" selection-end-line="40" selection-end-column="63" />
           <folding>
             <element signature="e#126#146#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Converter.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="144" column="62" selection-start-line="144" selection-start-column="62" selection-end-line="144" selection-end-column="62" />
+          <folding>
+            <element signature="e#53#75#0" expanded="true" />
           </folding>
         </state>
       </provider>

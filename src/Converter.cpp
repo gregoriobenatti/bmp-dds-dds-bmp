@@ -27,8 +27,34 @@ Converter::~Converter()
 }
 
 
-int Converter::convertDDSToBMP(DDS_HEADER header)
+int Converter::convertDDSToBMP(DDS_HEADER header) // change to pointer??
 {
+    // create BMP structure, refactor, put in other function
+    BITMAPFILEHEADER* bmpHeader = new BITMAPFILEHEADER();
+    BITMAPINFOHEADER* bmpInfoHeader = new BITMAPINFOHEADER();
+
+    bmpHeader->bfType = BF_TYPE_MB;
+    bmpHeader->bfSize = (header.dwWidth * header.dwHeight * 3) + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    bmpHeader->bfReserved1 = 0;
+    bmpHeader->bfReserved2 = 0;
+    bmpHeader->bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+    bmpInfoHeader->biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfoHeader->biWidth = header.dwWidth;
+    bmpInfoHeader->biHeight = header.dwHeight;
+    bmpInfoHeader->biPlanes = NUM_OF_PLANES;
+    bmpInfoHeader->biBitCount = BIT_COUNT_24;
+    bmpInfoHeader->biCompression = BI_RGB;
+    bmpInfoHeader->biSizeImage = (header.dwWidth * header.dwHeight * 3);
+    bmpInfoHeader->biXPelsPerMeter = PIXELS_PER_METER;
+    bmpInfoHeader->biYPelsPerMeter = PIXELS_PER_METER;
+    bmpInfoHeader->biClrUsed = 0;
+    bmpInfoHeader->biClrImportant = 0;
+
+    pixels = BMPUncompressedImageData(bmpInfoHeader->biSizeImage);
+
+
+    // write file BMP
     std::string fileName = "output.bmp";
     std::ofstream outputFile;
     outputFile.open(fileName, std::ofstream::out | std::ofstream::binary | std::ofstream::app);
@@ -41,56 +67,25 @@ int Converter::convertDDSToBMP(DDS_HEADER header)
 
     if (outputFile.is_open())
     {
-        /*
-         *
-         *
-         * DDS_PIXELFORMAT pixelFormat;
-    pixelFormat.dwSize        = INFO_SIZE;
-    pixelFormat.dwFlags       = DDPF_FOURCC;
-    pixelFormat.dwFourCC      = DXT1_FOURCC;
-    pixelFormat.dwRGBBitCount = 0;
-    pixelFormat.dwRBitMask    = 0;
-    pixelFormat.dwGBitMask    = 0;
-    pixelFormat.dwBBitMask    = 0;
-    pixelFormat.dwABitMask    = 0;
+        outputFile.write((const char *)&bmpHeader->bfType, 2);
+        outputFile.write((const char *)&bmpHeader->bfSize, 4);
+        outputFile.write((const char *)&bmpHeader->bfReserved1, 2);
+        outputFile.write((const char *)&bmpHeader->bfReserved2, 2);
+        outputFile.write((const char *)&bmpHeader->bfOffBits, 4);
 
-    ddsHeader->dwSize              = HEADER_SIZE;
-    ddsHeader->dwFlags             = FLAGS;
-    ddsHeader->dwHeight            = height;
-    ddsHeader->dwWidth             = width;
-    ddsHeader->dwPitchOrLinearSize = std::max(1, (int)(ddsHeader->dwWidth + 3) / 4) * std::max(1, (int)(ddsHeader->dwHeight + 3) / 4) * 8;
-    ddsHeader->dwDepth             = 0;
-    ddsHeader->dwMipMapCount       = 0;
-    ddsHeader->dwReserved1[11];
-    ddsHeader->ddspf               = pixelFormat;
-    ddsHeader->dwCaps              = DDSCAPS_TEXTURE;
-    ddsHeader->dwCaps2             = 0;
-    ddsHeader->dwCaps3             = 0;
-    ddsHeader->dwCaps4             = 0;
-    ddsHeader->dwReserved2         = 0;
-        */
+        outputFile.write((const char *)&bmpInfoHeader->biSize, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biWidth, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biHeight, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biPlanes, 2);
+        outputFile.write((const char *)&bmpInfoHeader->biBitCount, 2);
+        outputFile.write((const char *)&bmpInfoHeader->biCompression, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biSizeImage, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biXPelsPerMeter, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biYPelsPerMeter, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biClrUsed, 4);
+        outputFile.write((const char *)&bmpInfoHeader->biClrImportant, 4); 
 
-        outputFile.write((const char *)&fileHeader->bfType, 2);      // bfType
-        outputFile.write((const char *)&fileHeader->bfSize, 4);      // bfSize
-        outputFile.write((const char *)&fileHeader->bfReserved1, 2); // bfReserved1
-        outputFile.write((const char *)&fileHeader->bfReserved2, 2); // bfReserved2
-        outputFile.write((const char *)&fileHeader->bfOffBits, 4);   // bfOffBits,
-
-        outputFile.write((const char *)&infoHeader->biSize, 4);          // biSize
-        outputFile.write((const char *)&infoHeader->biWidth, 4);         // biWidth
-        outputFile.write((const char *)&infoHeader->biHeight, 4);        // biHeight
-        outputFile.write((const char *)&infoHeader->biPlanes, 2);        // biPlanes
-        outputFile.write((const char *)&infoHeader->biBitCount, 2);      // biBitCount
-        outputFile.write((const char *)&infoHeader->biCompression, 4);   // biCompression
-        outputFile.write((const char *)&infoHeader->biSizeImage, 4);     // biSizeImage
-        outputFile.write((const char *)&infoHeader->biXPelsPerMeter, 4); // biXPelsPerMeter
-        outputFile.write((const char *)&infoHeader->biYPelsPerMeter, 4); // biYPelsPerMeter
-        outputFile.write((const char *)&infoHeader->biClrUsed, 4);       // biClrUsed
-        outputFile.write((const char *)&infoHeader->biClrImportant, 4);  // biClrImportant
-
-        // pixel =
-
-        unsigned int imageSize = infoHeader->biSizeImage;
+        unsigned int imageSize = bmpInfoHeader->biSizeImage;
         uint8_t* pCopy = new uint8_t[imageSize];
         memcpy(pCopy, pixels, imageSize);
 
@@ -101,7 +96,7 @@ int Converter::convertDDSToBMP(DDS_HEADER header)
             pCopy[i + 2] = tmpRGB;
         }
 
-        unsigned int arraySize = infoHeader->biSizeImage;
+        unsigned int arraySize = bmpInfoHeader->biSizeImage;
         for (unsigned int i = 0; i < arraySize; ++i) {
             outputFile.write((const char *)&pCopy[i], 1);
         }
@@ -116,6 +111,41 @@ int Converter::convertDDSToBMP(DDS_HEADER header)
 
 int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* inforHeader)
 {
+    // create BMP structure, refactor, put in other function
+    //Create header
+    DDS_HEADER* ddsHeader = new DDS_HEADER();
+
+    ddsHeader->dwSize = HEADER_SIZE;
+    ddsHeader->dwFlags = FLAGS;
+    ddsHeader->dwHeight = inforHeader->biWidth;
+    ddsHeader->dwWidth = inforHeader->biHeight;
+    ddsHeader->dwPitchOrLinearSize = std::max((unsigned int)1, (unsigned int)(ddsHeader->dwWidth + 3) / 4) * std::max((unsigned int)1, (unsigned int)(ddsHeader->dwHeight + 3) / 4) * 8;
+    ddsHeader->dwDepth = 0;
+    ddsHeader->dwMipMapCount = 0;
+    ddsHeader->dwReserved1[11];
+
+    //Create pixel format
+    DDS_PIXELFORMAT pixelFormat;
+    pixelFormat.dwSize = INFO_SIZE;
+    pixelFormat.dwFlags = DDPF_FOURCC;
+    pixelFormat.dwFourCC = DXT1_FOURCC;
+    pixelFormat.dwRGBBitCount = 0;
+    pixelFormat.dwRBitMask = 0;
+    pixelFormat.dwGBitMask = 0;
+    pixelFormat.dwBBitMask = 0;
+    pixelFormat.dwABitMask = 0;
+
+    ddsHeader->ddspf = pixelFormat;
+    ddsHeader->dwCaps = DDSCAPS_TEXTURE;
+    ddsHeader->dwCaps2 = 0;
+    ddsHeader->dwCaps3 = 0;
+    ddsHeader->dwCaps4 = 0;
+    ddsHeader->dwReserved2 = 0;
+
+    dataBuffer = DDSUncompressedImageData(inforHeader->biWidth, inforHeader->biHeight); //DXT1Compress(uncompressedImageData, m_pDdsHeader->dwPitchOrLinearSize, imageSize, width, height);
+
+
+    // write file DDS
     std::string fileName = "output.dds";
     std::ofstream outputFile;
     outputFile.open(fileName, std::ofstream::out | std::ofstream::binary | std::ofstream::app);
@@ -123,37 +153,34 @@ int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* i
     if (outputFile.is_open())
     {
         outputFile.write((const char *)"DDS ", 4);
-        outputFile.write((const char *)&header->dwSize, 4);              // dwSize
-        outputFile.write((const char *)&header->dwFlags, 4);             // dwFlags
-        outputFile.write((const char *)&header->dwHeight, 4);            // dwHeight
-        outputFile.write((const char *)&header->dwWidth, 4);             // dwWidth
-        outputFile.write((const char *)&header->dwPitchOrLinearSize, 4); // dwPitchOrLinearSize
-        outputFile.write((const char *)&header->dwDepth, 4);             // dwDepth
-        outputFile.write((const char *)&header->dwMipMapCount, 4);       // dwMipMapCount
-        outputFile.write((const char *)&header->dwReserved1, 44);        // dwReserved1
+        outputFile.write((const char *)&ddsHeader->dwSize, 4);              // dwSize
+        outputFile.write((const char *)&ddsHeader->dwFlags, 4);             // dwFlags
+        outputFile.write((const char *)&ddsHeader->dwHeight, 4);            // dwHeight
+        outputFile.write((const char *)&ddsHeader->dwWidth, 4);             // dwWidth
+        outputFile.write((const char *)&ddsHeader->dwPitchOrLinearSize, 4); // dwPitchOrLinearSize
+        outputFile.write((const char *)&ddsHeader->dwDepth, 4);             // dwDepth
+        outputFile.write((const char *)&ddsHeader->dwMipMapCount, 4);       // dwMipMapCount
+        outputFile.write((const char *)&ddsHeader->dwReserved1, 44);        // dwReserved1
 
-        outputFile.write((const char *)&header->ddspf.dwSize, 4);        // ddspf.dwSize
-        outputFile.write((const char *)&header->ddspf.dwFlags, 4);       // ddspf.dwFlags
-        outputFile.write((const char *)&header->ddspf.dwFourCC, 4);      // ddspf.dwFourCC
-        outputFile.write((const char *)&header->ddspf.dwRGBBitCount, 4); // ddspf.dwRGBBitCount
-        outputFile.write((const char *)&header->ddspf.dwRBitMask, 4);    // ddspf.dwRBitMask
-        outputFile.write((const char *)&header->ddspf.dwGBitMask, 4);    // ddspf.dwGBitMask
-        outputFile.write((const char *)&header->ddspf.dwBBitMask, 4);    // ddspf.dwBBitMask
-        outputFile.write((const char *)&header->ddspf.dwABitMask, 4);    // ddspf.dwABitMask
+        outputFile.write((const char *)&ddsHeader->ddspf.dwSize, 4);        // ddspf.dwSize
+        outputFile.write((const char *)&ddsHeader->ddspf.dwFlags, 4);       // ddspf.dwFlags
+        outputFile.write((const char *)&ddsHeader->ddspf.dwFourCC, 4);      // ddspf.dwFourCC
+        outputFile.write((const char *)&ddsHeader->ddspf.dwRGBBitCount, 4); // ddspf.dwRGBBitCount
+        outputFile.write((const char *)&ddsHeader->ddspf.dwRBitMask, 4);    // ddspf.dwRBitMask
+        outputFile.write((const char *)&ddsHeader->ddspf.dwGBitMask, 4);    // ddspf.dwGBitMask
+        outputFile.write((const char *)&ddsHeader->ddspf.dwBBitMask, 4);    // ddspf.dwBBitMask
+        outputFile.write((const char *)&ddsHeader->ddspf.dwABitMask, 4);    // ddspf.dwABitMask
 
-        outputFile.write((const char *)&header->dwCaps, 4);      // dwCaps
-        outputFile.write((const char *)&header->dwCaps2, 4);     // dwCaps2
-        outputFile.write((const char *)&header->dwDepth, 4);     // dwDepth
-        outputFile.write((const char *)&header->dwCaps3, 4);     // dwCaps3
-        outputFile.write((const char *)&header->dwReserved2, 4); // dwReserved2
-
-        // dataBuffer =
-
-        unsigned int arraySize = header->dwPitchOrLinearSize;
+        outputFile.write((const char *)&ddsHeader->dwCaps, 4);      // dwCaps
+        outputFile.write((const char *)&ddsHeader->dwCaps2, 4);     // dwCaps2
+        outputFile.write((const char *)&ddsHeader->dwDepth, 4);     // dwDepth
+        outputFile.write((const char *)&ddsHeader->dwCaps3, 4);     // dwCaps3
+        outputFile.write((const char *)&ddsHeader->dwReserved2, 4); // dwReserved2
+        
+        unsigned int arraySize = ddsHeader->dwPitchOrLinearSize;
         for (unsigned int i = 0; i < arraySize; ++i) {
             outputFile.write((const char *)&dataBuffer[i], 1);
         }
-
         outputFile.close();
     }
 
@@ -164,4 +191,34 @@ int Converter::convertBMPToDDS(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* i
 bool Converter::isFileSizeValid(int width, int height)
 {
     return ((width%4 == 0) && (height%4 == 0)) ? true : false;
+}
+
+
+
+uint8_t* Converter::BMPUncompressedImageData(int imageSize) const
+{
+    if (pixels == nullptr)
+        return nullptr;
+
+    //Copy the image data to avoid awkward accidental deleting
+    uint8_t* pCopy = new uint8_t[imageSize];
+    memcpy(pCopy, pixels, imageSize);
+
+    return pCopy;
+}
+
+
+uint8_t* Converter::DDSUncompressedImageData(int dwWidth, int dwHeight) const
+{
+    if (dataBuffer == nullptr)
+        return nullptr;
+
+    //const unsigned int width = dwWidth;
+    //const unsigned int height = dwHeight;
+
+    //Allocate memory for uncompressed image data, width * height * 3 color bytes per pixel
+    //uint8_t* bytesBuffer = new uint8_t[width * height * 3];
+    uint8_t* bytesBuffer = new uint8_t[dwWidth * dwHeight * 3];
+
+    return bytesBuffer;
 }

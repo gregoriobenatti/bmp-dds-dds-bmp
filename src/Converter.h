@@ -37,6 +37,9 @@ public:
 
     bool isFileSizeValid(int width, int height);
 
+    uint8_t* BMPUncompressedImageData(int imageSize) const;
+    uint8_t* DDSUncompressedImageData(int dwWidth, int dwHeight) const;
+
 private:
     uint8_t* dataBuffer; //DDS
     uint8_t* pixels;     //BMP
