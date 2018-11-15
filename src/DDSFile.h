@@ -40,27 +40,12 @@ typedef struct {
 } DDS_HEADER;
 
 
-#ifndef MAKEFOURCC
-#define MAKEFOURCC(c0,c1,c2,c3) ((unsigned int)(char)(c0)|((unsigned int)(char)(c1)<<8)|((unsigned int)(char)(c2)<<16)|((unsigned int)(char)(c3)<<24))
-#endif
-
-#define DDPF_FOURCC 0x4
-#define DXT1_FOURCC (MAKEFOURCC('D', 'X', 'T', '1'))
-#define FLAGS 0x81007
-#define HEADER_SIZE 124
-#define INFO_SIZE 32
-#define DDSCAPS_TEXTURE 0x1000
-
-
 class DDSFile {
 public:
     DDSFile();
     virtual ~DDSFile();
 
-    void DDSInit(std::string fileName);
-    void createDDSFile(unsigned long height, unsigned long width);
-    void writeFile(DDS_HEADER* header);
-    bool isFileSizeValid(int width, int height);
+    DDS_HEADER DDSInit(std::string fileName);
 
 
 private:

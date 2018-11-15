@@ -15,7 +15,6 @@ BMPFile::BMPFile()
 {
     bmpHeader = nullptr;
     bmpInfoHeader = nullptr;
-    pixels = nullptr;
 }
 
 
@@ -23,20 +22,16 @@ BMPFile::~BMPFile()
 {
     delete[] bmpHeader;
     delete[] bmpInfoHeader;
-
-    if (pixels != nullptr)
-    {
-        delete[] pixels;
-    }
 }
 
 
-void BMPFile::BMPInit(std::string fileName)
+BMPSTRUCT BMPFile::BMPInit(std::string fileName)
 {
+    BMPSTRUCT bmp;
+
     std::cout << "[BMPFile] BMPInit" << std::endl;
 
     uint8_t* dataBuffer[2] = { nullptr, nullptr };
-    pixels = nullptr;
     bmpHeader = nullptr;
     bmpInfoHeader = nullptr;
 
@@ -48,19 +43,19 @@ void BMPFile::BMPInit(std::string fileName)
 
     dataBuffer[0] = new uint8_t[sizeof(BITMAPFILEHEADER)];
     dataBuffer[1] = new uint8_t[sizeof(BITMAPINFOHEADER)];
-    bmpHeader = (BITMAPFILEHEADER*)dataBuffer[0];
-    bmpInfoHeader = (BITMAPINFOHEADER*)dataBuffer[1];
 
     static constexpr size_t HEADER_SIZE = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
     std::array<char, HEADER_SIZE> header;
     file.read(header.data(), header.size());
 
+    bmpHeader = (BITMAPFILEHEADER*)dataBuffer[0];
     bmpHeader->bfSize      = *reinterpret_cast<uint32_t *>(&header[0]);  // The header field used to identify the BMP and DIB file is 0x42 0x4D in hexadecimal, same as BM in ASCII (BM, BA, CI, CP, IC, PT)
     bmpHeader->bfType      = *reinterpret_cast<uint32_t *>(&header[2]);  // The size of the BMP file in bytes
     bmpHeader->bfReserved1 = *reinterpret_cast<uint32_t *>(&header[6]);  // Reserved; actual value depends on the application that creates the image
     bmpHeader->bfReserved2 = *reinterpret_cast<uint32_t *>(&header[8]);  // Reserved; actual value depends on the application that creates the image
     bmpHeader->bfOffBits   = *reinterpret_cast<uint32_t *>(&header[10]); // The offset, i.e. starting address, of the byte where the bitmap image data (pixel array) can be found.
 
+    bmpInfoHeader = (BITMAPINFOHEADER*)dataBuffer[1];
     bmpInfoHeader->biSize          = *reinterpret_cast<uint32_t *>(&header[14]); // the size of this header (40 bytes)
     bmpInfoHeader->biWidth         = *reinterpret_cast<uint32_t *>(&header[18]); // the bitmap width in pixels (signed integer)
     bmpInfoHeader->biHeight        = *reinterpret_cast<uint32_t *>(&header[22]); // the bitmap height in pixels (signed integer)
@@ -72,69 +67,10 @@ void BMPFile::BMPInit(std::string fileName)
     bmpInfoHeader->biYPelsPerMeter = *reinterpret_cast<uint32_t *>(&header[42]); // the vertical resolution of the image. (pixel per metre, signed integer)
     bmpInfoHeader->biClrUsed       = *reinterpret_cast<uint32_t *>(&header[46]); // the number of colors in the color palette, or 0 to default to 2n
     bmpInfoHeader->biClrImportant  = *reinterpret_cast<uint32_t *>(&header[50]); // the number of important colors used, or 0 when every color is important; generally ignored
+
+    bmp.fileHeader = bmpHeader;
+    bmp.infoHeader = bmpInfoHeader;
+
+    return bmp;
 }
 
-
-void BMPFile::writeFile(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* infoHeader)
-{
-    std::string fileName = "output.bmp";
-    std::ofstream outputFile;
-    outputFile.open(fileName, std::ofstream::out | std::ofstream::binary | std::ofstream::app);
-
-    if (!isFileSizeValid(infoHeader->biWidth, infoHeader->biHeight))
-    {
-        std::cout << "File size not valid" << std::endl;
-    }
-
-    if (outputFile.is_open())
-    {
-        outputFile.write((const char *)&fileHeader->bfType, 2);
-        outputFile.write((const char *)&fileHeader->bfSize, 4);
-        outputFile.write((const char *)&fileHeader->bfReserved1, 2);
-        outputFile.write((const char *)&fileHeader->bfReserved2, 2);
-        outputFile.write((const char *)&fileHeader->bfOffBits, 4);
-
-        outputFile.write((const char *)&infoHeader->biSize, 4);
-        outputFile.write((const char *)&infoHeader->biWidth, 4);
-        outputFile.write((const char *)&infoHeader->biHeight, 4);
-        outputFile.write((const char *)&infoHeader->biPlanes, 2);
-        outputFile.write((const char *)&infoHeader->biBitCount, 2);
-        outputFile.write((const char *)&infoHeader->biCompression, 4);
-        outputFile.write((const char *)&infoHeader->biSizeImage, 4);
-        outputFile.write((const char *)&infoHeader->biXPelsPerMeter, 4);
-        outputFile.write((const char *)&infoHeader->biYPelsPerMeter, 4);
-        outputFile.write((const char *)&infoHeader->biClrUsed, 4);
-        outputFile.write((const char *)&infoHeader->biClrImportant, 4);
-
-        unsigned int imageSize = infoHeader->biSizeImage;
-        uint8_t* pCopy = new uint8_t[imageSize];
-        memcpy(pCopy, pixels, imageSize);
-
-        for (unsigned long i = 0; i < imageSize; i += 3) {
-            uint8_t tmpRGB = 0;
-            tmpRGB = pCopy[i];
-            pCopy[i] = pCopy[i + 2];
-            pCopy[i + 2] = tmpRGB;
-        }
-
-        unsigned int arraySize = infoHeader->biSizeImage;
-        for (unsigned int i = 0; i < arraySize; ++i) {
-            outputFile.write((const char *)&pCopy[i], 1);
-        }
-        outputFile.close();
-
-        delete[] pCopy;
-    }
-}
-
-
-void BMPFile::createBMPFile()
-{
-    writeFile(bmpHeader, bmpInfoHeader);
-}
-
-
-bool BMPFile::isFileSizeValid(int width, int height)
-{
-    return ((width%4 == 0) && (height%4 == 0)) ? true : false;
-}

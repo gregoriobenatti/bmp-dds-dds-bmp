@@ -9,6 +9,7 @@
 #include <string>
 #include <stdint.h>
 
+
 typedef struct {
     unsigned short bfType;
     unsigned int   bfSize;
@@ -33,20 +34,23 @@ typedef struct {
 } BITMAPINFOHEADER;
 
 
+typedef struct {
+    BITMAPFILEHEADER* fileHeader;
+    BITMAPINFOHEADER* infoHeader;
+} BMPSTRUCT;
+
+
 class BMPFile {
 public:
     BMPFile();
     virtual ~BMPFile();
 
-    void BMPInit(std::string fileName);
-    void createBMPFile();
-    void writeFile(BITMAPFILEHEADER* fileHeader, BITMAPINFOHEADER* infoHeader);
-    bool isFileSizeValid(int width, int height);
+    BMPSTRUCT BMPInit(std::string fileName);
+
 
 private:
     BITMAPFILEHEADER* bmpHeader;
     BITMAPINFOHEADER* bmpInfoHeader;
-    uint8_t* pixels;
 };
 
 

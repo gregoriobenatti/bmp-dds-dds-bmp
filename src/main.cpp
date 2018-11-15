@@ -1,6 +1,7 @@
 
 #include "BMPFile.h"
 #include "DDSFile.h"
+#include "Converter.h"
 #include <iostream>
 #include <string>
 #include <array>
@@ -19,11 +20,9 @@ const std::string MAN  = "man";
 void help()
 {
     std::cout << "\n\n--- BMP-DDS-DDS-BMP ---\n" << std::endl;
-    std::cout << "Arguments --> INPUT.FILE and OUTPUT.FILE or only INPUT.FILE \n"
-              << "Support to FILE.NAME or /PATH/TO/FILE.NAME \n"
-              << "./converter input.file output.file \n"
-              << "OR \n"
-              << "./converter input.file \n\n\n"
+    std::cout << "Arguments --> INPUT.FILE\n"
+              << "Need to be a file in the same directory as the executable\n"
+              << "./converter input.file\n\n\n"
               << std::endl;
 }
 
@@ -51,21 +50,24 @@ void convertTo(std::string fileExtension, std::string fileName)
 
     std::shared_ptr<BMPFile> pBMPFile(new BMPFile);
     std::shared_ptr<DDSFile> pDDSFile(new DDSFile);
+    std::shared_ptr<Converter> converter(new Converter);
 
     if (fileExtension == BMP)
     {
-        pBMPFile->BMPInit(fileName); // Read file and test size
-        pDDSFile->createDDSFile(400, 400);
+        BMPSTRUCT header = pBMPFile->BMPInit(fileName);
+        converter->convertBMPToDDS(header.fileHeader, header.infoHeader);
     }
     else if (fileExtension == DDS)
     {
-        pDDSFile->DDSInit(fileName);
-        pBMPFile->createBMPFile();
+        DDS_HEADER header = pDDSFile->DDSInit(fileName);
+        converter->convertDDSToBMP(header);
     }
     else
     {
         std::cout << "File not supported." << std::endl;
     }
+
+    std::cout << "[Converting] Finish convert file." <<std::endl;
 }
 
 
@@ -81,7 +83,7 @@ int main(int argc, char* argv[])
         else
         {
             std::string fileExtension = getFileExtension(argv[1]);
-            std::cout << "\n[Start] Init." <<std::endl;
+            std::cout << "\n[Start] bmp-dds-dds-bmp." <<std::endl;
 
             if ((fileExtension != BMP) && (fileExtension != DDS))
             {
@@ -91,7 +93,7 @@ int main(int argc, char* argv[])
 
             convertTo(fileExtension, argv[1]);
 
-            std::cout << "[Finish] Done." <<std::endl;
+            std::cout << "\n[Finish] bmp-dds-dds-bmp." <<std::endl;
         }
     }
     catch (...)
